@@ -7,6 +7,7 @@ public class Main {
         data.putData(new File("test.csv"), ",");
         int i = 0;
         for (Chunk chunk : data.chunks) {
+            //comment
             Record record = null;
             chunk.startReading();
             while ((record = chunk.getNext()) != null) {
