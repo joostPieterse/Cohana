@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Random;
 
 public class Main {
+    public static final DateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy/MM/dd:HHmm");
 
     public static void main(String[] args) {
         Main main = new Main();
@@ -21,7 +22,7 @@ public class Main {
             Record record = null;
             chunk.startReading();
             while ((record = chunk.getNext()) != null) {
-                System.out.println("User: " + record.user + " action: " + record.action + " chunk: " + i);
+                System.out.println("User: " + record.user + " time: " + record.time + " action: " + record.action + " chunk: " + i);
             }
             i++;
         }
@@ -31,7 +32,6 @@ public class Main {
         Random r = new Random();
         String[] possibleCountries = {"USA", "China", "Australia", "The Netherlands"};
         String[] possibleRoles = {"dwarf", "assassin", "wizard", "bandit"};
-        DateFormat df = new SimpleDateFormat("yyyy/MM/dd:HHmm");
         Calendar cal = Calendar.getInstance(); // creates calendar
         cal.setTime(new Date()); // sets calendar time/date
         Date dateOfPreviousUser = new Date();
@@ -62,7 +62,7 @@ public class Main {
                         if ("shop".equals(action)) {
                             gold = (r.nextInt(10) + 1) * 10;
                         }
-                        String dateString = df.format(cal.getTime());
+                        String dateString = DATE_FORMATTER.format(cal.getTime());
                         writer.write(i + ";" + dateString + ";" + action + ";" + role + ";" + country + ";" + gold + "\n");
                     }
                     cal.add(Calendar.DATE, r.nextInt(3));

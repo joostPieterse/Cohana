@@ -1,20 +1,23 @@
 import java.util.ArrayList;
+import java.util.Date;
 
 public class Chunk {
     private ArrayList<Triple> userColumn = new ArrayList<>();
     private ArrayList<Integer> actionColumnList = new ArrayList<>();
-    private ArrayList<Integer> timeColumn = new ArrayList<>();
+    private ArrayList<Integer> timeColumnList = new ArrayList<>();
 
     private ArrayList<Integer> chunkActionDict = new ArrayList<>();
+    private ArrayList<Integer> chunkTimeDict = new ArrayList<>();
 
     private Column actionColumn;
+    private Column timeColumn;
 
     private int pointer = 0;
     private int numLines = 0;
     private int userColumnSize = 0;
 
     //ASSUMES SORTED DATA
-    public void insert(int user, int actionId) {
+    public void insert(int user, int timeId, int actionId) {
         boolean userAlreadyExists = false;
         for (Triple triple : userColumn) {
             if (triple.u == user) {
@@ -29,12 +32,17 @@ public class Chunk {
             chunkActionDict.add(actionId);
         }
         actionColumnList.add(chunkActionDict.indexOf((Integer) actionId));
+        if (!chunkTimeDict.contains(timeId)) {
+            chunkTimeDict.add(timeId);
+        }
+        timeColumnList.add(chunkTimeDict.indexOf((Integer) timeId));
     }
 
     public void finalizeInsert() {
         numLines = actionColumnList.size();
         userColumnSize = userColumn.size();
         actionColumn = new Column(actionColumnList);
+        timeColumn = new Column(timeColumnList);
     }
 
     public void startReading() {
@@ -73,9 +81,10 @@ public class Chunk {
         }
         Triple user = getCurrentUser();
         String action = Data.globalActionDict.get(chunkActionDict.get((int) actionColumn.get(pointer)));
-        //TODO time
-
+        long timeMinutes = Data.globalTimeDict.get(chunkTimeDict.get((int) timeColumn.get(pointer)));
+        long timeMillis = timeMinutes* 60 * 1000;
+        String dateString = Main.DATE_FORMATTER.format(new Date(timeMillis));
         pointer++;
-        return new Record(user.u, action, 0);
+        return new Record(user.u, dateString, action);
     }
 }
