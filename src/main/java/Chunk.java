@@ -23,7 +23,7 @@ public class Chunk {
             }
         }
         if (!userAlreadyExists) {
-            userColumn.add(new Triple(user, userColumn.size(), 1));
+            userColumn.add(new Triple(user, actionColumnList.size(), 1));
         }
         if (!chunkActionDict.contains(actionId)) {
             chunkActionDict.add(actionId);

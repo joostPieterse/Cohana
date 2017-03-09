@@ -31,7 +31,7 @@ public class Data {
                     chunks.add(new Chunk());
                 }
                 Chunk chunk = chunks.get(chunkNumber);
-                String action = line[1];
+                String action = line[2];
                 if (!globalActionDict.contains(action)) {
                     globalActionDict.add(action);
                 }
