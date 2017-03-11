@@ -26,6 +26,7 @@ public class Column {
         }
     }
 
+    //minTime needs to be added to this for the time column
     public int get(int index) {
         if (index < 0 || index >= numValues) {
             throw new IndexOutOfBoundsException("index: " + index + " length: " + numValues);

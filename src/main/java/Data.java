@@ -11,8 +11,8 @@ import java.util.Date;
 public class Data {
     //the index is the id
     public static ArrayList<String> globalActionDict = new ArrayList<>();
-    public static ArrayList<Integer> globalTimeDict = new ArrayList<>();
     public ArrayList<Chunk> chunks = new ArrayList<>();
+    public int minTime, maxTime;
 
     //maximum chunk size in number of lines
     public static final int CHUNK_SIZE = 5;
@@ -40,16 +40,12 @@ public class Data {
                 Date date = Main.DATE_FORMATTER.parse(dateString);
                 long dateMillis = date.getTime();
                 int dateMinutes = (int) (dateMillis / 1000 / 60);
-                if (!globalTimeDict.contains(dateMinutes)) {
-                    globalTimeDict.add(dateMinutes);
-                }
-                int timeId = globalTimeDict.indexOf(dateMinutes);
                 String action = line[2];
                 if (!globalActionDict.contains(action)) {
                     globalActionDict.add(action);
                 }
                 int actionId = globalActionDict.indexOf(action);
-                chunk.insert(Integer.parseInt(user), timeId, actionId);
+                chunk.insert(Integer.parseInt(user), dateMinutes, actionId);
                 previousUser = user;
                 i++;
             }

@@ -7,7 +7,7 @@ public class Chunk {
     private ArrayList<Integer> timeColumnList = new ArrayList<>();
 
     private ArrayList<Integer> chunkActionDict = new ArrayList<>();
-    private ArrayList<Integer> chunkTimeDict = new ArrayList<>();
+    private int minTime, maxTime;
 
     private Column actionColumn;
     private Column timeColumn;
@@ -17,7 +17,7 @@ public class Chunk {
     private int userColumnSize = 0;
 
     //ASSUMES SORTED DATA
-    public void insert(int user, int timeId, int actionId) {
+    public void insert(int user, int dateMinutes, int actionId) {
         boolean userAlreadyExists = false;
         for (Triple triple : userColumn) {
             if (triple.u == user) {
@@ -32,16 +32,17 @@ public class Chunk {
             chunkActionDict.add(actionId);
         }
         actionColumnList.add(chunkActionDict.indexOf((Integer) actionId));
-        if (!chunkTimeDict.contains(timeId)) {
-            chunkTimeDict.add(timeId);
-        }
-        timeColumnList.add(chunkTimeDict.indexOf((Integer) timeId));
+        timeColumnList.add(dateMinutes);
     }
 
     public void finalizeInsert() {
         numLines = actionColumnList.size();
         userColumnSize = userColumn.size();
         actionColumn = new Column(actionColumnList);
+        for (int time : timeColumnList) {
+            minTime = Math.min(time, minTime);
+            maxTime = Math.max(time, maxTime);
+        }
         timeColumn = new Column(timeColumnList);
     }
 
@@ -81,10 +82,23 @@ public class Chunk {
         }
         Triple user = getCurrentUser();
         String action = Data.globalActionDict.get(chunkActionDict.get((int) actionColumn.get(pointer)));
-        long timeMinutes = Data.globalTimeDict.get(chunkTimeDict.get((int) timeColumn.get(pointer)));
-        long timeMillis = timeMinutes* 60 * 1000;
+        long timeMinutes = getTime(pointer);
+        long timeMillis = timeMinutes * 60 * 1000;
         String dateString = Main.DATE_FORMATTER.format(new Date(timeMillis));
         pointer++;
         return new Record(user.u, dateString, action);
+    }
+
+
+    public int getMinTime() {
+        return minTime;
+    }
+
+    public int getMaxTime() {
+        return maxTime;
+    }
+
+    private int getTime(int index) {
+        return timeColumn.get(index) + minTime;
     }
 }
