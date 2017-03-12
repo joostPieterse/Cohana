@@ -12,7 +12,9 @@ public class Data {
     //the index is the id
     public static ArrayList<String> globalActionDict = new ArrayList<>();
     public ArrayList<Chunk> chunks = new ArrayList<>();
-    public int minTime, maxTime;
+
+
+    private int minTime, maxTime;
 
     //maximum chunk size in number of lines
     public static final int CHUNK_SIZE = 5;
@@ -57,5 +59,12 @@ public class Data {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+    }
+    public int getMinTime() {
+        return minTime;
+    }
+
+    public int getMaxTime() {
+        return maxTime;
     }
 }
