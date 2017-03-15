@@ -81,7 +81,7 @@ public class Chunk {
             return null;
         }
         Triple user = getCurrentUser();
-        String action = Data.globalActionDict.get(chunkActionDict.get((int) actionColumn.get(pointer)));
+        String action = Data.globalActionDict.inverse().get(chunkActionDict.get((int) actionColumn.get(pointer)));
         long timeMinutes = getTime(pointer);
         long timeMillis = timeMinutes * 60 * 1000;
         String dateString = Main.DATE_FORMATTER.format(new Date(timeMillis));

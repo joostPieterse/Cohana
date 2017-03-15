@@ -1,3 +1,5 @@
+import com.google.common.collect.*;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -5,19 +7,19 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.*;
 
 public class Data {
     //the index is the id
-    public static ArrayList<String> globalActionDict = new ArrayList<>();
+    private static SortedMap<String, Integer> unsortedGlobalActionDict = new TreeMap<>();
+    public static ImmutableBiMap<String, Integer> globalActionDict;
     public ArrayList<Chunk> chunks = new ArrayList<>();
 
 
     private int minTime, maxTime;
 
     //maximum chunk size in number of lines
-    public static final int CHUNK_SIZE = 5;
+    public static final int CHUNK_SIZE = 1000;
 
     public void putData(File file, String delimiter) {
         int chunkNumber = 0;
@@ -43,16 +45,20 @@ public class Data {
                 long dateMillis = date.getTime();
                 int dateMinutes = (int) (dateMillis / 1000 / 60);
                 String action = line[2];
-                if (!globalActionDict.contains(action)) {
-                    globalActionDict.add(action);
+                if (!unsortedGlobalActionDict.containsKey(action)) {
+                    unsortedGlobalActionDict.put(action, unsortedGlobalActionDict.size());
                 }
-                int actionId = globalActionDict.indexOf(action);
+                int actionId = unsortedGlobalActionDict.get(action);
                 chunk.insert(Integer.parseInt(user), dateMinutes, actionId);
                 previousUser = user;
                 i++;
             }
             //finalize last chunk
             chunks.get(chunks.size() - 1).finalizeInsert();
+
+            //sort dictionaries
+            globalActionDict = ImmutableBiMap.copyOf(Maps.newTreeMap(unsortedGlobalActionDict));
+
             br.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -60,6 +66,29 @@ public class Data {
             e.printStackTrace();
         }
     }
+
+    //Binary search for finding a global id in a disctionary for a string column
+    //gives -1 if not found
+    public int binarySearch(String string, ImmutableBiMap<String, Integer> map) {
+        return binarySearch(string, map, map.keySet().asList(), map.values().asList(), 0, map.size() - 1);
+    }
+
+    private int binarySearch(String string, ImmutableBiMap<String, Integer> map, ImmutableList<String> keyList, ImmutableList<Integer> valueList, int low, int high) {
+        if (low > high) {
+            return -1;
+        }
+        int mid = (low + high) / 2;
+        String midString = keyList.get(mid);
+        if (string.compareTo(midString) < 0) {
+            return binarySearch(string, map, keyList, valueList, low, mid - 1);
+        } else if (string.compareTo(midString) > 0) {
+            return binarySearch(string, map, keyList, valueList, mid + 1, high);
+        } else {
+            return valueList.get((int) mid);
+        }
+
+    }
+
     public int getMinTime() {
         return minTime;
     }
