@@ -70,19 +70,19 @@ public class Data {
     //Binary search for finding a global id in a disctionary for a string column
     //gives -1 if not found
     public int binarySearch(String string, ImmutableBiMap<String, Integer> map) {
-        return binarySearch(string, map, map.keySet().asList(), map.values().asList(), 0, map.size() - 1);
+        return binarySearch(string,map.keySet().asList(), map.values().asList(), 0, map.size() - 1);
     }
 
-    private int binarySearch(String string, ImmutableBiMap<String, Integer> map, ImmutableList<String> keyList, ImmutableList<Integer> valueList, int low, int high) {
+    private int binarySearch(String string, ImmutableList<String> keyList, ImmutableList<Integer> valueList, int low, int high) {
         if (low > high) {
             return -1;
         }
         int mid = (low + high) / 2;
         String midString = keyList.get(mid);
         if (string.compareTo(midString) < 0) {
-            return binarySearch(string, map, keyList, valueList, low, mid - 1);
+            return binarySearch(string, keyList, valueList, low, mid - 1);
         } else if (string.compareTo(midString) > 0) {
-            return binarySearch(string, map, keyList, valueList, mid + 1, high);
+            return binarySearch(string, keyList, valueList, mid + 1, high);
         } else {
             return valueList.get((int) mid);
         }
