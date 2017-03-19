@@ -11,7 +11,7 @@ public class Main {
     public static void main(String[] args) {
         Main main = new Main();
         //main.generateData(1000000, "lotsOfData.txt");
-        main.test();
+        main.testBirthSelection();
     }
 
     private void test() {
@@ -19,10 +19,25 @@ public class Main {
         data.putData(new File("data.txt"), ";");
         int i = 0;
         for (Chunk chunk : data.chunks) {
-            Record record = null;
-            chunk.startReading();
-            while ((record = chunk.getNext()) != null) {
-                System.out.println("User: " + record.user + " time: " + record.time + " action: " + record.action + " chunk: " + i);
+            Tuple tuple = null;
+            chunk.open();
+            while ((tuple = chunk.getNext()) != null) {
+                System.out.println(tuple.toString() + " chunk: " + i);
+            }
+            i++;
+        }
+    }
+
+    private void testBirthSelection(){
+        Data data = new Data();
+        data.putData(new File("data.txt"), ";");
+        int i = 0;
+        for (Chunk chunk : data.chunks) {
+            Tuple tuple = null;
+            BirthSelectionOperator op = new BirthSelectionOperator(chunk, "launch");
+            op.open();
+            while ((tuple = op.getNext()) != null) {
+                System.out.println(tuple.toString() + " chunk: " + i);
             }
             i++;
         }

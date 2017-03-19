@@ -13,6 +13,10 @@ public class Data {
     //the index is the id
     private static SortedMap<String, Integer> unsortedGlobalActionDict = new TreeMap<>();
     public static ImmutableBiMap<String, Integer> globalActionDict;
+    private static SortedMap<String, Integer> unsortedGlobalRoleDict = new TreeMap<>();
+    public static ImmutableBiMap<String, Integer> globalRoleDict;
+    private static SortedMap<String, Integer> unsortedGlobalCountryDict = new TreeMap<>();
+    public static ImmutableBiMap<String, Integer> globalCountryDict;
     public ArrayList<Chunk> chunks = new ArrayList<>();
 
 
@@ -44,12 +48,23 @@ public class Data {
                 Date date = Main.DATE_FORMATTER.parse(dateString);
                 long dateMillis = date.getTime();
                 int dateMinutes = (int) (dateMillis / 1000 / 60);
+                int gold = Integer.parseInt(line[5]);
                 String action = line[2];
                 if (!unsortedGlobalActionDict.containsKey(action)) {
                     unsortedGlobalActionDict.put(action, unsortedGlobalActionDict.size());
                 }
                 int actionId = unsortedGlobalActionDict.get(action);
-                chunk.insert(Integer.parseInt(user), dateMinutes, actionId);
+                String role = line[3];
+                if (!unsortedGlobalRoleDict.containsKey(role)) {
+                    unsortedGlobalRoleDict.put(role, unsortedGlobalRoleDict.size());
+                }
+                int roleId = unsortedGlobalRoleDict.get(role);
+                String country = line[4];
+                if (!unsortedGlobalCountryDict.containsKey(country)) {
+                    unsortedGlobalCountryDict.put(country, unsortedGlobalCountryDict.size());
+                }
+                int countryId = unsortedGlobalCountryDict.get(country);
+                chunk.insert(Integer.parseInt(user), dateMinutes, actionId, roleId, countryId, gold);
                 previousUser = user;
                 i++;
             }
@@ -58,6 +73,8 @@ public class Data {
 
             //sort dictionaries
             globalActionDict = ImmutableBiMap.copyOf(Maps.newTreeMap(unsortedGlobalActionDict));
+            globalRoleDict = ImmutableBiMap.copyOf(Maps.newTreeMap(unsortedGlobalRoleDict));
+            globalCountryDict = ImmutableBiMap.copyOf(Maps.newTreeMap(unsortedGlobalCountryDict));
 
             br.close();
         } catch (IOException e) {
@@ -67,7 +84,7 @@ public class Data {
         }
     }
 
-    //Binary search for finding a global id in a disctionary for a string column
+    //Binary search for finding a global id in a dictionary for a string column
     //gives -1 if not found
     public int binarySearch(String string, ImmutableBiMap<String, Integer> map) {
         return binarySearch(string,map.keySet().asList(), map.values().asList(), 0, map.size() - 1);
