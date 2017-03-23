@@ -18,6 +18,6 @@ public class Tuple {
 
     @Override
     public String toString() {
-        return "{user:" + user + " action:" + action + " time:" + time + " role:" + role + " country:" + country + " gold:" + gold;
+        return "{user:" + user + " action:" + action + " time:" + time + " role:" + role + " country:" + country + " gold:" + gold+"}";
     }
 }

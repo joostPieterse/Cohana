@@ -11,7 +11,7 @@ public class Main {
     public static void main(String[] args) {
         Main main = new Main();
         //main.generateData(1000000, "lotsOfData.txt");
-        main.testBirthSelection();
+        main.testAgeSelection();
     }
 
     private void test() {
@@ -35,6 +35,21 @@ public class Main {
         for (Chunk chunk : data.chunks) {
             Tuple tuple = null;
             BirthSelectionOperator op = new BirthSelectionOperator(chunk, "launch");
+            op.open();
+            while ((tuple = op.getNext()) != null) {
+                System.out.println(tuple.toString() + " chunk: " + i);
+            }
+            i++;
+        }
+    }
+
+    private void testAgeSelection(){
+        Data data = new Data();
+        data.putData(new File("data.txt"), ";");
+        int i = 0;
+        for (Chunk chunk : data.chunks) {
+            Tuple tuple = null;
+            AgeSelectionOperator op = new AgeSelectionOperator(chunk, "launch");
             op.open();
             while ((tuple = op.getNext()) != null) {
                 System.out.println(tuple.toString() + " chunk: " + i);
