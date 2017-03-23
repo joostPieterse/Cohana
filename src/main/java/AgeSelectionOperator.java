@@ -1,31 +1,18 @@
 
-public class AgeSelectionOperator {
-    private Chunk chunk;
-    private String action;
-
-    private int currentUser;
+public class AgeSelectionOperator extends Operator{
 
     public AgeSelectionOperator(Chunk chunk, String action) {
         this.chunk = chunk;
         this.action = action;
     }
 
-    public Tuple getBirthTuple(Tuple firstTuple) {
-        Tuple tuple = firstTuple;
-        while (tuple.user == currentUser && !action.equals(tuple.action)) {
-            tuple = chunk.getNext();
-            if (tuple == null) {
-                return null;
-            }
-        }
-        return tuple;
-    }
-
+    @Override
     public void open() {
         chunk.open();
         currentUser = -1;
     }
 
+    @Override
     public Tuple getNext() {
         Triple user = chunk.getNextUser();
         Tuple nextTuple = chunk.getNext();
@@ -34,7 +21,7 @@ public class AgeSelectionOperator {
         }
         while (nextTuple.user == currentUser) {
             //some condition on the birth tuple
-            if ("bandit".equals(nextTuple.role)) {
+            if ("shop".equals(nextTuple.action) && !"China".equals(nextTuple.country)) {
                 return nextTuple;
             }
             nextTuple = chunk.getNext();

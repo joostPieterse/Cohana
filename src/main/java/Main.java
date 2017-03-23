@@ -30,7 +30,7 @@ public class Main {
 
     private void testBirthSelection(){
         Data data = new Data();
-        data.putData(new File("data.txt"), ";");
+        data.putData(new File("paperData.txt"), ";");
         int i = 0;
         for (Chunk chunk : data.chunks) {
             Tuple tuple = null;
@@ -45,11 +45,11 @@ public class Main {
 
     private void testAgeSelection(){
         Data data = new Data();
-        data.putData(new File("data.txt"), ";");
+        data.putData(new File("paperData.txt"), ";");
         int i = 0;
         for (Chunk chunk : data.chunks) {
             Tuple tuple = null;
-            AgeSelectionOperator op = new AgeSelectionOperator(chunk, "launch");
+            AggregationOperator op = new AggregationOperator(chunk, "shop");
             op.open();
             while ((tuple = op.getNext()) != null) {
                 System.out.println(tuple.toString() + " chunk: " + i);
