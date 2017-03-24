@@ -2,12 +2,12 @@
 public class Tuple {
     int user;
     String action;
-    String time;
+    long time;
     String role;
     String country;
     int gold;
 
-    public Tuple(int user, String action, String time, String role, String country, int gold) {
+    public Tuple(int user, String action, long time, String role, String country, int gold) {
         this.user = user;
         this.action = action;
         this.time = time;

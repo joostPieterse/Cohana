@@ -117,10 +117,9 @@ public class Chunk {
         String country = Data.globalCountryDict.inverse().get(chunkCountryDict.get((int) countryColumn.get(pointer)));
         long timeMinutes = getTime(pointer);
         long timeMillis = timeMinutes * 60 * 1000;
-        String dateString = Main.DATE_FORMATTER.format(new Date(timeMillis));
         int gold = getGold(pointer);
         pointer++;
-        return new Tuple(user.u, action, dateString, role, country, gold);
+        return new Tuple(user.u, action, timeMillis, role, country, gold);
     }
 
 
