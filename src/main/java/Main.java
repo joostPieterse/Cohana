@@ -49,7 +49,7 @@ public class Main {
         int i = 0;
         for (Chunk chunk : data.chunks) {
             Tuple tuple = null;
-            AggregationOperator op = new AggregationOperator(chunk, "shop");
+            AgeSelectionOperator op = new AgeSelectionOperator(chunk, "shop");
             op.open();
             while ((tuple = op.getNext()) != null) {
                 System.out.println(tuple.toString() + " chunk: " + i);
