@@ -1,8 +1,5 @@
 import org.apache.commons.collections.keyvalue.MultiKey;
 import org.apache.commons.collections.map.MultiKeyMap;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -12,11 +9,13 @@ import java.util.HashMap;
 public class Benchmark {
     Data data = new Data();
 
-    public Benchmark() {
-        data.importData(new File("data.txt"), ";");
-    }
-
-    public void test(){
+    public void test(File file, String delimiter){
+        data = new Data();
+        System.out.println("Benchmark for "+file.getName());
+        long startTime = System.currentTimeMillis();
+        data.importData(file, delimiter);
+        long duration = System.currentTimeMillis()-startTime;
+        System.out.println("Importing data took "+duration+"ms");
         testTablescan();
         testBirthSelection();
         testAgeSelection();
@@ -24,45 +23,55 @@ public class Benchmark {
     }
 
     public void testTablescan() {
+        long startTime = System.currentTimeMillis();
         int i = 0;
         for (Chunk chunk : data.chunks) {
             Tuple tuple = null;
             chunk.open();
             while ((tuple = chunk.getNext()) != null) {
-                System.out.println(tuple.toString() + " chunk: " + i);
+                //System.out.println(tuple.toString() + " chunk: " + i);
             }
             i++;
         }
+        long duration = System.currentTimeMillis()-startTime;
+        System.out.println("Table scan done in "+duration+"ms");
     }
 
     public void testBirthSelection() {
+        long startTime = System.currentTimeMillis();
         int i = 0;
         for (Chunk chunk : data.chunks) {
             Tuple tuple = null;
             BirthSelectionOperator op = new BirthSelectionOperator(chunk, "launch");
             op.open();
             while ((tuple = op.getNext()) != null) {
-                System.out.println(tuple.toString() + " chunk: " + i);
+                //System.out.println(tuple.toString() + " chunk: " + i);
             }
             i++;
         }
+        long duration = System.currentTimeMillis()-startTime;
+        System.out.println("Birth selection done in "+duration+"ms");
     }
 
     public void testAgeSelection() {
+        long startTime = System.currentTimeMillis();
         int i = 0;
         for (Chunk chunk : data.chunks) {
             Tuple tuple = null;
             AgeSelectionOperator op = new AgeSelectionOperator(chunk, "shop");
             op.open();
             while ((tuple = op.getNext()) != null) {
-                System.out.println(tuple.toString() + " chunk: " + i);
+                //System.out.println(tuple.toString() + " chunk: " + i);
             }
             i++;
         }
+        long duration = System.currentTimeMillis()-startTime;
+        System.out.println("Age selection done in "+duration+"ms");
     }
 
 
     public void testAggregation() {
+        long startTime = System.currentTimeMillis();
         Data data = new Data();
         data.importData(new File("data.txt"), ";");
         HashMap<String, Integer> cohortSizeMap = new HashMap();
@@ -94,6 +103,8 @@ public class Benchmark {
             }
             break;
         }
+        long duration = System.currentTimeMillis()-startTime;
+        System.out.println("Aggregation done in "+duration+"ms");
         writeToFile(cohortSizeMap, cohortMetricMap, new File("output.txt"));
     }
 

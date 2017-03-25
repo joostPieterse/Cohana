@@ -12,7 +12,7 @@ public class Main {
     public static void main(String[] args) {
         Benchmark benchmark = new Benchmark();
         //main.generateData(1000000, "lotsOfData.txt");
-        benchmark.test();
+        benchmark.test(new File("data.txt"), ";");
     }
 
     private void generateData(int numUsers, String fileName) {
