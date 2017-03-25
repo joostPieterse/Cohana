@@ -25,7 +25,7 @@ public class Data {
     //maximum chunk size in number of lines
     public static final int CHUNK_SIZE = 1000;
 
-    public void putData(File file, String delimiter) {
+    public void importData(File file, String delimiter) {
         int chunkNumber = 0;
         int i = 0;
         String previousUser = "";
@@ -86,11 +86,11 @@ public class Data {
 
     //Binary search for finding a global id in a dictionary for a string column
     //gives -1 if not found
-    public int binarySearch(String string, ImmutableBiMap<String, Integer> map) {
+    public static int binarySearch(String string, ImmutableBiMap<String, Integer> map) {
         return binarySearch(string,map.keySet().asList(), map.values().asList(), 0, map.size() - 1);
     }
 
-    private int binarySearch(String string, ImmutableList<String> keyList, ImmutableList<Integer> valueList, int low, int high) {
+    private static int binarySearch(String string, ImmutableList<String> keyList, ImmutableList<Integer> valueList, int low, int high) {
         if (low > high) {
             return -1;
         }

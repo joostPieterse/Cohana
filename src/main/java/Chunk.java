@@ -122,6 +122,13 @@ public class Chunk {
         return new Tuple(user.u, action, timeMillis, role, country, gold);
     }
 
+    public boolean containsAction(String action) {
+        int globalId = Data.binarySearch(action, Data.globalActionDict);
+        if (globalId == -1) {
+            return false;
+        }
+        return chunkActionDict.contains(globalId);
+    }
 
     public int getMinTime() {
         return minTime;

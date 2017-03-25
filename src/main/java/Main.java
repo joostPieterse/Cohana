@@ -1,3 +1,4 @@
+
 import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -9,53 +10,9 @@ public class Main {
     public static final DateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy/MM/dd:HHmm");
 
     public static void main(String[] args) {
-        Main main = new Main();
+        Benchmark benchmark = new Benchmark();
         //main.generateData(1000000, "lotsOfData.txt");
-        main.testAgeSelection();
-    }
-
-    private void test() {
-        Data data = new Data();
-        data.putData(new File("data.txt"), ";");
-        int i = 0;
-        for (Chunk chunk : data.chunks) {
-            Tuple tuple = null;
-            chunk.open();
-            while ((tuple = chunk.getNext()) != null) {
-                System.out.println(tuple.toString() + " chunk: " + i);
-            }
-            i++;
-        }
-    }
-
-    private void testBirthSelection(){
-        Data data = new Data();
-        data.putData(new File("paperData.txt"), ";");
-        int i = 0;
-        for (Chunk chunk : data.chunks) {
-            Tuple tuple = null;
-            BirthSelectionOperator op = new BirthSelectionOperator(chunk, "launch");
-            op.open();
-            while ((tuple = op.getNext()) != null) {
-                System.out.println(tuple.toString() + " chunk: " + i);
-            }
-            i++;
-        }
-    }
-
-    private void testAgeSelection(){
-        Data data = new Data();
-        data.putData(new File("paperData.txt"), ";");
-        int i = 0;
-        for (Chunk chunk : data.chunks) {
-            Tuple tuple = null;
-            AgeSelectionOperator op = new AgeSelectionOperator(chunk, "shop");
-            op.open();
-            while ((tuple = op.getNext()) != null) {
-                System.out.println(tuple.toString() + " chunk: " + i);
-            }
-            i++;
-        }
+        benchmark.test();
     }
 
     private void generateData(int numUsers, String fileName) {
@@ -76,7 +33,7 @@ public class Main {
                 int numActionGroups = 1;
                 //some users only play once
                 if (r.nextBoolean()) {
-                    numActionGroups = r.nextInt(40)+1;
+                    numActionGroups = r.nextInt(40) + 1;
                 }
                 for (int j = 0; j < numActionGroups; j++) {
                     int numActions = r.nextInt(8) + 1;
