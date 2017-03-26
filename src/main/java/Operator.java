@@ -2,7 +2,7 @@
 public abstract class Operator {
     protected Chunk chunk;
     protected String action;
-
+    protected Condition condition;
     protected int currentUser;
 
     protected Tuple getBirthTuple(Tuple firstTuple) {

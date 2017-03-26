@@ -130,22 +130,6 @@ public class Chunk {
         return chunkActionDict.contains(globalId);
     }
 
-    public int getMinTime() {
-        return minTime;
-    }
-
-    public int getMaxTime() {
-        return maxTime;
-    }
-
-    public int getMinGold() {
-        return minGold;
-    }
-
-    public int getMaxGold() {
-        return maxGold;
-    }
-
     private int getTime(int index) {
         return timeColumn.get(index) + minTime;
     }

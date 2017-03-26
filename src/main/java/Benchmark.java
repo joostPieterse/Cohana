@@ -7,10 +7,10 @@ import java.io.IOException;
 import java.util.HashMap;
 
 public class Benchmark {
-    Data data = new Data();
+    Data data = new Data(1000);
 
-    public void test(File file, String delimiter){
-        data = new Data();
+    public void test(File file, String delimiter, int chunkSize){
+        data = new Data(chunkSize);
         System.out.println("Benchmark for "+file.getName());
         long startTime = System.currentTimeMillis();
         data.importData(file, delimiter);
@@ -19,7 +19,8 @@ public class Benchmark {
         testTablescan();
         testBirthSelection();
         testAgeSelection();
-        testAggregation();
+        query1();
+        query3();
     }
 
     public void testTablescan() {
@@ -42,7 +43,17 @@ public class Benchmark {
         int i = 0;
         for (Chunk chunk : data.chunks) {
             Tuple tuple = null;
-            BirthSelectionOperator op = new BirthSelectionOperator(chunk, "launch");
+            BirthSelectionOperator op = new BirthSelectionOperator(chunk, "launch", new Condition() {
+                @Override
+                public boolean isBirthTupleQualified(Tuple tuple) {
+                    return "Australia".equals(tuple.country);
+                }
+
+                @Override
+                public boolean isAgeTupleQualified(Tuple tuple) {
+                    return true;
+                }
+            });
             op.open();
             while ((tuple = op.getNext()) != null) {
                 //System.out.println(tuple.toString() + " chunk: " + i);
@@ -58,7 +69,17 @@ public class Benchmark {
         int i = 0;
         for (Chunk chunk : data.chunks) {
             Tuple tuple = null;
-            AgeSelectionOperator op = new AgeSelectionOperator(chunk, "shop");
+            AgeSelectionOperator op = new AgeSelectionOperator(chunk, "shop", new Condition() {
+                @Override
+                public boolean isBirthTupleQualified(Tuple tuple) {
+                    return true;
+                }
+
+                @Override
+                public boolean isAgeTupleQualified(Tuple tuple) {
+                    return "bandit".equals(tuple.role);
+                }
+            });
             op.open();
             while ((tuple = op.getNext()) != null) {
                 //System.out.println(tuple.toString() + " chunk: " + i);
@@ -70,14 +91,12 @@ public class Benchmark {
     }
 
 
-    public void testAggregation() {
+    public void testAggregation(Condition condition, String queryNumber, String birthAction) {
         long startTime = System.currentTimeMillis();
-        Data data = new Data();
-        data.importData(new File("data.txt"), ";");
         HashMap<String, Integer> cohortSizeMap = new HashMap();
         MultiKeyMap cohortMetricMap = new MultiKeyMap();
         for (Chunk chunk : data.chunks) {
-            AggregationOperator op = new AggregationOperator(chunk, "shop", 1000 * 60 * 60 * 24);
+            AggregationOperator op = new AggregationOperator(chunk, birthAction, 1000 * 60 * 60 * 24, condition);
             op.open();
             HashMap<String, Integer> chunkCohortSizeMap = op.getCohortSizeMap();
             MultiKeyMap chunkCohortMetricMap = op.getCohortMetricMap();
@@ -104,11 +123,37 @@ public class Benchmark {
             break;
         }
         long duration = System.currentTimeMillis()-startTime;
-        System.out.println("Aggregation done in "+duration+"ms");
-        writeToFile(cohortSizeMap, cohortMetricMap, new File("output.txt"));
+        System.out.println("Query "+queryNumber+" took "+duration+"ms");
+        writeToFile(cohortSizeMap, cohortMetricMap, new File("query"+queryNumber+".txt"));
     }
 
+    private void query1(){
+        testAggregation(new Condition() {
+            @Override
+            public boolean isBirthTupleQualified(Tuple tuple) {
+                return true;
+            }
 
+            @Override
+            public boolean isAgeTupleQualified(Tuple tuple) {
+                return true;
+            }
+        }, "1", "launch");
+    }
+
+    private void query3(){
+        testAggregation(new Condition() {
+            @Override
+            public boolean isBirthTupleQualified(Tuple tuple) {
+                return true;
+            }
+
+            @Override
+            public boolean isAgeTupleQualified(Tuple tuple) {
+                return "shop".equals(tuple.action);
+            }
+        }, "3", "shop");
+    }
 
     private void writeToFile(HashMap<String, Integer> cohortSizeMap, MultiKeyMap cohortMetricMap, File file) {
         BufferedWriter bw = null;

@@ -1,9 +1,10 @@
 
 public class AgeSelectionOperator extends Operator{
 
-    public AgeSelectionOperator(Chunk chunk, String action) {
+    public AgeSelectionOperator(Chunk chunk, String action, Condition condition) {
         this.chunk = chunk;
         this.action = action;
+        this.condition = condition;
     }
 
     @Override
@@ -20,8 +21,8 @@ public class AgeSelectionOperator extends Operator{
             return null;
         }
         while (nextTuple.user == currentUser) {
-            //some condition on the birth tuple
-            if ("shop".equals(nextTuple.action) && !"China".equals(nextTuple.country)) {
+            //some condition on the age tuple
+            if (condition.isAgeTupleQualified(nextTuple)) {
                 return nextTuple;
             }
             nextTuple = chunk.getNext();

@@ -23,7 +23,11 @@ public class Data {
     private int minTime, maxTime;
 
     //maximum chunk size in number of lines
-    public static final int CHUNK_SIZE = 1000;
+    private  int chunkSize = 1000;
+
+    public Data(int chunkSize) {
+        this.chunkSize = chunkSize;
+    }
 
     public void importData(File file, String delimiter) {
         int chunkNumber = 0;
@@ -35,7 +39,7 @@ public class Data {
             while ((lineString = br.readLine()) != null) {
                 String[] line = lineString.split(delimiter);
                 String user = line[0];
-                if (i > CHUNK_SIZE && !user.equals(previousUser)) {
+                if (i > chunkSize && !user.equals(previousUser)) {
                     chunks.get(chunkNumber).finalizeInsert();
                     i = 0;
                     chunkNumber++;
@@ -104,13 +108,5 @@ public class Data {
             return valueList.get((int) mid);
         }
 
-    }
-
-    public int getMinTime() {
-        return minTime;
-    }
-
-    public int getMaxTime() {
-        return maxTime;
     }
 }

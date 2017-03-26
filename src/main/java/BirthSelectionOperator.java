@@ -3,9 +3,10 @@ import java.util.Hashtable;
 
 public class BirthSelectionOperator extends Operator{
 
-    public BirthSelectionOperator(Chunk chunk, String action) {
+    public BirthSelectionOperator(Chunk chunk, String action, Condition condition) {
         this.chunk = chunk;
         this.action = action;
+        this.condition = condition;
     }
 
     @Override
