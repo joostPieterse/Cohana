@@ -120,7 +120,6 @@ public class Benchmark {
                 }
                 cohortMetricMap.put(cohort, age, currentMetric + chunkMetric);
             }
-            break;
         }
         long duration = System.currentTimeMillis()-startTime;
         System.out.println("Query "+queryNumber+" took "+duration+"ms");

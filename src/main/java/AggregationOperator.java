@@ -20,18 +20,14 @@ public class AggregationOperator extends Operator {
     public void open() {
         chunk.open();
         AgeSelectionOperator ageSelectionOperator = new AgeSelectionOperator(chunk, action, condition);
-        Triple user = chunk.getNextUser();
 
         //check if the action is done in the chunk at all
         if (!chunk.containsAction(action)) {
             return;
         }
         Tuple tuple = chunk.getNext();
-        while (user != null) {
-            currentUser = user.u;
-            if (tuple == null) {
-                break;
-            }
+        while (tuple != null) {
+            currentUser = tuple.user;
             Tuple birthTuple = getBirthTuple(tuple);
             if (birthTuple == null) {
                 break;
@@ -63,7 +59,6 @@ public class AggregationOperator extends Operator {
                 chunk.skipCurUser();
                 tuple = chunk.getNext();
             }
-            user = chunk.getNextUser();
         }
     }
 
