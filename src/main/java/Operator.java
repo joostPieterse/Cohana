@@ -1,13 +1,14 @@
 
 public abstract class Operator {
     protected Chunk chunk;
-    protected String action;
+    protected String birthValue;
+    protected String birthColumnName;
     protected Condition condition;
     protected int currentUser;
 
     protected Tuple getBirthTuple(Tuple firstTuple) {
         Tuple tuple = firstTuple;
-        while (tuple.user == currentUser && !action.equals(tuple.action)) {
+        while (tuple.user == currentUser && !birthValue.equals(tuple.stringValues.get(birthColumnName))) {
             tuple = chunk.getNext();
             if (tuple == null) {
                 return null;
