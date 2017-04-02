@@ -1,23 +1,26 @@
+import java.util.HashMap;
+import java.util.Map;
 
 public class Tuple {
     int user;
-    String action;
     long time;
-    String role;
-    String country;
-    int gold;
+    Map<String, Integer> intValues = new HashMap<>();
+    Map<String, String> stringValues = new HashMap<>();
 
-    public Tuple(int user, String action, long time, String role, String country, int gold) {
+    public Tuple(int user, long time, Map<String, Integer> intValues, Map<String, String> stringValues) {
         this.user = user;
-        this.action = action;
         this.time = time;
-        this.role = role;
-        this.country = country;
-        this.gold = gold;
+        this.intValues = intValues;
+        this.stringValues = stringValues;
     }
 
     @Override
     public String toString() {
-        return "{user:" + user + " action:" + action + " time:" + time + " role:" + role + " country:" + country + " gold:" + gold+"}";
+        String result = "{user:" + user + " time:" + time;
+        for(String columnName:intValues.keySet()){
+            result += " "+columnName+":"+intValues.get(columnName);
+        }
+        result += "}";
+        return result;
     }
 }

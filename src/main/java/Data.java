@@ -4,32 +4,28 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Data {
-    //the index is the id
-    private static SortedMap<String, Integer> unsortedGlobalActionDict = new TreeMap<>();
-    public static ImmutableBiMap<String, Integer> globalActionDict;
-    private static SortedMap<String, Integer> unsortedGlobalRoleDict = new TreeMap<>();
-    public static ImmutableBiMap<String, Integer> globalRoleDict;
-    private static SortedMap<String, Integer> unsortedGlobalCountryDict = new TreeMap<>();
-    public static ImmutableBiMap<String, Integer> globalCountryDict;
     public ArrayList<Chunk> chunks = new ArrayList<>();
 
+    //from column name to type of the column
+    public static LinkedHashMap<String, Type> columnTypeMap = new LinkedHashMap<>();
 
-    private int minTime, maxTime;
+    //the index is the id
+    private static Map<String, SortedMap<String, Integer>> unsortedDictionaries = new HashMap<>();
+    public static Map<String, ImmutableBiMap<String, Integer>> globalDictionaries = new HashMap<>();
 
     //maximum chunk size in number of lines
-    private  int chunkSize = 1000;
+    private int chunkSize = 1000;
 
     public Data(int chunkSize) {
         this.chunkSize = chunkSize;
     }
 
-    public void importData(File file, String delimiter) {
+    public void importData(File file, LinkedHashMap<String, Type> columnTypeMap, String delimiter) {
+        Data.columnTypeMap = columnTypeMap;
         int chunkNumber = 0;
         int i = 0;
         String previousUser = "";
@@ -52,23 +48,27 @@ public class Data {
                 Date date = Main.DATE_FORMATTER.parse(dateString);
                 long dateMillis = date.getTime();
                 int dateMinutes = (int) (dateMillis / 1000 / 60);
-                int gold = Integer.parseInt(line[5]);
-                String action = line[2];
-                if (!unsortedGlobalActionDict.containsKey(action)) {
-                    unsortedGlobalActionDict.put(action, unsortedGlobalActionDict.size());
+
+                HashMap<String, Integer> values = new HashMap<>();
+                int colNumber = 2;
+                for (String columnName : columnTypeMap.keySet()) {
+                    String val = line[colNumber];
+                    if (columnTypeMap.get(columnName) == Type.INTEGER) {
+                        values.put(columnName, Integer.parseInt(val));
+                    } else if (columnTypeMap.get(columnName) == Type.STRING) {
+                        if (!unsortedDictionaries.containsKey(columnName)) {
+                            unsortedDictionaries.put(columnName, new TreeMap<>());
+                        }
+                        SortedMap<String, Integer> dict = unsortedDictionaries.get(columnName);
+                        if (!dict.containsKey(val)) {
+                            dict.put(val, dict.size());
+                        }
+                        values.put(columnName, dict.get(val));
+                    }
+                    colNumber++;
                 }
-                int actionId = unsortedGlobalActionDict.get(action);
-                String role = line[3];
-                if (!unsortedGlobalRoleDict.containsKey(role)) {
-                    unsortedGlobalRoleDict.put(role, unsortedGlobalRoleDict.size());
-                }
-                int roleId = unsortedGlobalRoleDict.get(role);
-                String country = line[4];
-                if (!unsortedGlobalCountryDict.containsKey(country)) {
-                    unsortedGlobalCountryDict.put(country, unsortedGlobalCountryDict.size());
-                }
-                int countryId = unsortedGlobalCountryDict.get(country);
-                chunk.insert(Integer.parseInt(user), dateMinutes, actionId, roleId, countryId, gold);
+
+                chunk.insert(Integer.parseInt(user), dateMinutes, values);
                 previousUser = user;
                 i++;
             }
@@ -76,10 +76,9 @@ public class Data {
             chunks.get(chunks.size() - 1).finalizeInsert();
 
             //sort dictionaries
-            globalActionDict = ImmutableBiMap.copyOf(Maps.newTreeMap(unsortedGlobalActionDict));
-            globalRoleDict = ImmutableBiMap.copyOf(Maps.newTreeMap(unsortedGlobalRoleDict));
-            globalCountryDict = ImmutableBiMap.copyOf(Maps.newTreeMap(unsortedGlobalCountryDict));
-
+            for (String columnName : unsortedDictionaries.keySet()) {
+                globalDictionaries.put(columnName, ImmutableBiMap.copyOf(Maps.newTreeMap(unsortedDictionaries.get(columnName))));
+            }
             br.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -91,7 +90,7 @@ public class Data {
     //Binary search for finding a global id in a dictionary for a string column
     //gives -1 if not found
     public static int binarySearch(String string, ImmutableBiMap<String, Integer> map) {
-        return binarySearch(string,map.keySet().asList(), map.values().asList(), 0, map.size() - 1);
+        return binarySearch(string, map.keySet().asList(), map.values().asList(), 0, map.size() - 1);
     }
 
     private static int binarySearch(String string, ImmutableList<String> keyList, ImmutableList<Integer> valueList, int low, int high) {

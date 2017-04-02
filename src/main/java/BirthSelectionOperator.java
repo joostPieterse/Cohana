@@ -3,9 +3,10 @@ import java.util.Hashtable;
 
 public class BirthSelectionOperator extends Operator{
 
-    public BirthSelectionOperator(Chunk chunk, String action, Condition condition) {
+    public BirthSelectionOperator(Chunk chunk, String birthValue, String birthColumnName, Condition condition) {
         this.chunk = chunk;
-        this.action = action;
+        this.birthValue = birthValue;
+        this.birthColumnName = birthColumnName;
         this.condition = condition;
     }
 
@@ -30,7 +31,7 @@ public class BirthSelectionOperator extends Operator{
             Tuple birthTuple = getBirthTuple(nextTuple);
 
             //some condition on the birth tuple
-            if ("Australia".equals(birthTuple.country)) {
+            if (condition.isBirthTupleQualified(birthTuple)) {
                 return nextTuple;
             }
             chunk.skipCurUser();

@@ -1,9 +1,10 @@
 
 public class AgeSelectionOperator extends Operator{
 
-    public AgeSelectionOperator(Chunk chunk, String action, Condition condition) {
+    public AgeSelectionOperator(Chunk chunk, String birthValue, String birthColumnName, Condition condition) {
         this.chunk = chunk;
-        this.action = action;
+        this.birthValue = birthValue;
+        this.birthColumnName = birthColumnName;
         this.condition = condition;
     }
 

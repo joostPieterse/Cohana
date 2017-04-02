@@ -4,14 +4,19 @@ import java.util.HashMap;
 
 public class AggregationOperator extends Operator {
 
-    long timeStep;
-    HashMap<String, Integer> cohortSizeMap = new HashMap();
-    MultiKeyMap cohortMetricMap = new MultiKeyMap();
+    private long timeStep;
+    private HashMap<String, Integer> cohortSizeMap = new HashMap();
+    private MultiKeyMap cohortMetricMap = new MultiKeyMap();
+    private String cohortColumn;
+    private String metricColumn;
 
     //timeStep in ms
-    public AggregationOperator(Chunk chunk, String action, long timeStep, Condition condition) {
+    public AggregationOperator(Chunk chunk, String birthValue, String birthColumnName, String cohortColumn, String metricColumn, long timeStep, Condition condition) {
         this.chunk = chunk;
-        this.action = action;
+        this.birthValue = birthValue;
+        this.birthColumnName = birthColumnName;
+        this.cohortColumn = cohortColumn;
+        this.metricColumn = metricColumn;
         this.timeStep = timeStep;
         this.condition = condition;
     }
@@ -19,10 +24,9 @@ public class AggregationOperator extends Operator {
     @Override
     public void open() {
         chunk.open();
-        AgeSelectionOperator ageSelectionOperator = new AgeSelectionOperator(chunk, action, condition);
 
         //check if the action is done in the chunk at all
-        if (!chunk.containsAction(action)) {
+        if (!chunk.columnContainsString(birthColumnName, birthValue)) {
             return;
         }
         Tuple tuple = chunk.getNext();
@@ -35,20 +39,22 @@ public class AggregationOperator extends Operator {
             //check if user is qualified
             if (condition.isBirthTupleQualified(birthTuple)) {
                 //increase cohort size
-                Integer currentSize = cohortSizeMap.get(tuple.country);
+                Integer currentSize = cohortSizeMap.get(tuple.stringValues.get(cohortColumn));
                 if (currentSize == null) {
                     currentSize = 0;
                 }
-                cohortSizeMap.put(tuple.country, currentSize + 1);
+                String birthCountry = tuple.stringValues.get(cohortColumn);
+                cohortSizeMap.put(birthCountry, currentSize + 1);
+
                 while (tuple.user == currentUser) {
                     //update metric if qualified
                     if(condition.isAgeTupleQualified(tuple)) {
                         int age = (int) ((tuple.time - birthTuple.time) / timeStep);
-                        Integer currentMetric = (Integer) cohortMetricMap.get(tuple.country, age);
+                        Integer currentMetric = (Integer) cohortMetricMap.get(birthCountry, age);
                         if (currentMetric == null) {
                             currentMetric = 0;
                         }
-                        cohortMetricMap.put(tuple.country, age, currentMetric + tuple.gold);
+                        cohortMetricMap.put(birthCountry, age, currentMetric + tuple.intValues.get(metricColumn));
                     }
                     tuple = chunk.getNext();
                     if (tuple == null) {
