@@ -1,7 +1,7 @@
 import java.util.HashMap;
 import java.util.Hashtable;
 
-public class BirthSelectionOperator extends Operator{
+public class BirthSelectionOperator extends Operator {
 
     public BirthSelectionOperator(Chunk chunk, String birthValue, String birthColumnName, Condition condition) {
         this.chunk = chunk;
@@ -31,8 +31,10 @@ public class BirthSelectionOperator extends Operator{
             Tuple birthTuple = getBirthTuple(nextTuple);
 
             //some condition on the birth tuple
-            if (condition.isBirthTupleQualified(birthTuple)) {
-                return nextTuple;
+            if (birthTuple != null) {
+                if (condition.isBirthTupleQualified(birthTuple)) {
+                    return nextTuple;
+                }
             }
             chunk.skipCurUser();
             user = chunk.getNextUser();

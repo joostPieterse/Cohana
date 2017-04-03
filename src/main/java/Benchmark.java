@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 public class Benchmark {
-    Data data = new Data(1000);
+    Data data = new Data(10000);
 
     public void test(File file, String delimiter, int chunkSize) {
         data = new Data(chunkSize);
@@ -23,12 +23,12 @@ public class Benchmark {
         data.importData(file, columnTypeMap, delimiter);
         long duration = System.currentTimeMillis() - startTime;
         System.out.println("Importing data took " + duration + "ms");
-        testTablescan();
+        /*testTablescan();
         testBirthSelection();
         testAgeSelection();
         query1();
-        query3();
-        testExampleQuery();
+        query3();*/
+        exampleQuery();
     }
 
     public void testTablescan() {
@@ -135,7 +135,7 @@ public class Benchmark {
     }
 
 
-    private void testExampleQuery() {
+    private void exampleQuery() {
         testAggregation(new Condition() {
             @Override
             public boolean isBirthTupleQualified(Tuple tuple) {

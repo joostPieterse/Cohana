@@ -35,7 +35,7 @@ public class Chunk {
             }
         }
         if (!userAlreadyExists) {
-            userColumn.add(new Triple(user, numLines, 1));
+            userColumn.add(new Triple(user, numLines - 1, 1));
         }
         timeColumnList.add(dateMinutes);
 
@@ -90,7 +90,7 @@ public class Chunk {
     private Triple getCurrentUser() {
         for (int i = 0; i < userColumn.size(); i++) {
             Triple triple = userColumn.get(i);
-            if (triple.f + triple.n > pointer - 1) {
+            if (triple.f + triple.n > pointer) {
                 return triple;
             }
         }
@@ -100,7 +100,7 @@ public class Chunk {
     public Triple getNextUser() {
         for (int i = 0; i < userColumnSize; i++) {
             Triple triple = userColumn.get(i);
-            if (triple.f + triple.n > pointer) {
+            if (triple.n > pointer) {
                 return userColumn.get(i);
             }
         }
@@ -111,7 +111,7 @@ public class Chunk {
         if (pointer >= numLines) {
             return null;
         }
-        Triple user = getNextUser();
+        Triple user = getCurrentUser();
         long timeMinutes = timeColumn.get(pointer) + minTime;
         long timeMillis = timeMinutes * 60 * 1000;
 
@@ -126,8 +126,9 @@ public class Chunk {
                 stringValues.put(columnName, Data.globalDictionaries.get(columnName).inverse().get(id));
             }
         }
+        Tuple tuple = new Tuple(user.u, timeMillis, intValues, stringValues);
         pointer++;
-        return new Tuple(user.u, timeMillis, intValues, stringValues);
+        return tuple;
     }
 
     public boolean columnContainsString(String columnName, String value) {

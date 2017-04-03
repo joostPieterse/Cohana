@@ -10,8 +10,8 @@ public class Tuple {
     public Tuple(int user, long time, Map<String, Integer> intValues, Map<String, String> stringValues) {
         this.user = user;
         this.time = time;
-        this.intValues = intValues;
-        this.stringValues = stringValues;
+        this.intValues = new HashMap<>(intValues);
+        this.stringValues = new HashMap<>(stringValues);
     }
 
     @Override
@@ -19,6 +19,9 @@ public class Tuple {
         String result = "{user:" + user + " time:" + time;
         for(String columnName:intValues.keySet()){
             result += " "+columnName+":"+intValues.get(columnName);
+        }
+        for(String columnName:stringValues.keySet()){
+            result += " "+columnName+":"+stringValues.get(columnName);
         }
         result += "}";
         return result;

@@ -34,27 +34,30 @@ public class AggregationOperator extends Operator {
             currentUser = tuple.user;
             Tuple birthTuple = getBirthTuple(tuple);
             if (birthTuple == null) {
-                break;
+                chunk.skipCurUser();
+                tuple = chunk.getNext();
+                continue;
             }
+            //always update cohort size
+            Integer currentSize = cohortSizeMap.get(tuple.stringValues.get(cohortColumn));
+            if (currentSize == null) {
+                currentSize = 0;
+            }
+            String birthValue = tuple.stringValues.get(cohortColumn);
+            long birthTime = birthTuple.time;
+            cohortSizeMap.put(birthValue, currentSize + 1);
+
             //check if user is qualified
             if (condition.isBirthTupleQualified(birthTuple)) {
-                //increase cohort size
-                Integer currentSize = cohortSizeMap.get(tuple.stringValues.get(cohortColumn));
-                if (currentSize == null) {
-                    currentSize = 0;
-                }
-                String birthCountry = tuple.stringValues.get(cohortColumn);
-                cohortSizeMap.put(birthCountry, currentSize + 1);
-
                 while (tuple.user == currentUser) {
                     //update metric if qualified
-                    if(condition.isAgeTupleQualified(tuple)) {
-                        int age = (int) ((tuple.time - birthTuple.time) / timeStep);
-                        Integer currentMetric = (Integer) cohortMetricMap.get(birthCountry, age);
+                    int age = (int) ((tuple.time - birthTime) / timeStep);
+                    if (condition.isAgeTupleQualified(tuple)) {
+                        Integer currentMetric = (Integer) cohortMetricMap.get(birthValue, age);
                         if (currentMetric == null) {
                             currentMetric = 0;
                         }
-                        cohortMetricMap.put(birthCountry, age, currentMetric + tuple.intValues.get(metricColumn));
+                        cohortMetricMap.put(birthValue, age, currentMetric + tuple.intValues.get(metricColumn));
                     }
                     tuple = chunk.getNext();
                     if (tuple == null) {
