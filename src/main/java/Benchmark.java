@@ -24,11 +24,11 @@ public class Benchmark {
         data.importData(file, columnTypeMap, delimiter);
         long duration = System.currentTimeMillis() - startTime;
         System.out.println("Importing data took " + duration + "ms");
-        /*testTablescan();
-        testBirthSelection();
-        testAgeSelection();
+//        testTablescan();
+//        testBirthSelection();
+//        testAgeSelection();
         query1();
-        query3();*/
+        query3();
         exampleQuery();
     }
 

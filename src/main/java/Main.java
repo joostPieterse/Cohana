@@ -13,7 +13,7 @@ public class Main {
     public static void main(String[] args) {
         Benchmark benchmark = new Benchmark();
         //new Main().generateData(200, "input/mysqlData.csv");
-        benchmark.test(new File("input/mysqlData.csv"), ";", 10000);
+        benchmark.test(new File("input/mysqlData.csv"), ";", 1000);
     }
 
     private void generateData(int numUsers, String fileName) {
