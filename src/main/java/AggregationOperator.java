@@ -41,10 +41,6 @@ public class AggregationOperator extends Operator {
             cohortSizeMap.put(birthValue, currentSize + 1);
             Tuple birthTuple = getBirthTuple(tuple);
             if (birthTuple == null) {
-                //Workaround for users with only one tuple
-                if (chunk.getCurrentUser().u == currentUser) {
-                    chunk.skipCurUser();
-                }
                 tuple = chunk.getNext();
                 continue;
             }
@@ -68,6 +64,9 @@ public class AggregationOperator extends Operator {
                 }
             } else {
                 //Workaround for users with only one tuple
+                if (chunk.getCurrentUser() == null) {
+                    break;
+                }
                 if (chunk.getCurrentUser().u == currentUser) {
                     chunk.skipCurUser();
                 }
