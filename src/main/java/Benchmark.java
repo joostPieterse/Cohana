@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class Benchmark {
     Data data = new Data(10000);
@@ -101,7 +102,7 @@ public class Benchmark {
 
     public void testAggregation(Condition condition, String queryNumber, String birthAction, String birthColumn, String cohortColumn, String metricColumn) {
         long startTime = System.currentTimeMillis();
-        HashMap<String, Integer> cohortSizeMap = new HashMap();
+        Map<String, Integer> cohortSizeMap = new HashMap();
         MultiKeyMap cohortMetricMap = new MultiKeyMap();
         for (Chunk chunk : data.chunks) {
             AggregationOperator op = new AggregationOperator(chunk, birthAction,birthColumn,
@@ -177,7 +178,7 @@ public class Benchmark {
         }, "3", "shop", "action", "country", "gold");
     }
 
-    private void writeToFile(HashMap<String, Integer> cohortSizeMap, MultiKeyMap cohortMetricMap, File file) {
+    private void writeToFile(Map<String, Integer> cohortSizeMap, MultiKeyMap cohortMetricMap, File file) {
         BufferedWriter bw = null;
         try {
             bw = new BufferedWriter(new FileWriter(file));

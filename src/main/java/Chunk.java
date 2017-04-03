@@ -44,18 +44,18 @@ public class Chunk {
                 columnLists.put(columnName, new ArrayList<>());
             }
             Type type = Data.columnTypeMap.get(columnName);
-            int value = values.get(columnName);
+            int globalId = values.get(columnName);
             if (type == Type.INTEGER) {
-                columnLists.get(columnName).add(value);
+                columnLists.get(columnName).add(globalId);
             } else if (type == Type.STRING) {
                 if (!dictionaries.containsKey(columnName)) {
                     dictionaries.put(columnName, new ArrayList<>());
                 }
                 ArrayList<Integer> dict = dictionaries.get(columnName);
-                if (!dict.contains(value)) {
-                    dict.add(value);
+                if (!dict.contains(globalId)) {
+                    dict.add(globalId);
                 }
-                columnLists.get(columnName).add(value);
+                columnLists.get(columnName).add(dict.indexOf(globalId));
             }
         }
     }
@@ -84,10 +84,12 @@ public class Chunk {
 
     public void skipCurUser() {
         Triple currentUser = getCurrentUser();
-        pointer = currentUser.f + currentUser.n;
+        if(currentUser != null){
+            pointer = currentUser.f + currentUser.n;
+        }
     }
 
-    private Triple getCurrentUser() {
+    public Triple getCurrentUser() {
         for (int i = 0; i < userColumn.size(); i++) {
             Triple triple = userColumn.get(i);
             if (triple.f + triple.n > pointer) {
@@ -122,8 +124,9 @@ public class Chunk {
             if (Data.columnTypeMap.get(columnName) == Type.INTEGER) {
                 intValues.put(columnName, column.get(pointer) + minValues.get(columnName));
             } else if (Data.columnTypeMap.get(columnName) == Type.STRING) {
-                int id = dictionaries.get(columnName).get((int) column.get(pointer));
-                stringValues.put(columnName, Data.globalDictionaries.get(columnName).inverse().get(id));
+                int chunkId = column.get(pointer);
+                int globalId = dictionaries.get(columnName).get(chunkId);
+                stringValues.put(columnName, Data.globalDictionaries.get(columnName).inverse().get(globalId));
             }
         }
         Tuple tuple = new Tuple(user.u, timeMillis, intValues, stringValues);

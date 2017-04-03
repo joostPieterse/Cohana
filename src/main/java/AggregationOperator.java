@@ -32,21 +32,23 @@ public class AggregationOperator extends Operator {
         Tuple tuple = chunk.getNext();
         while (tuple != null) {
             currentUser = tuple.user;
-            Tuple birthTuple = getBirthTuple(tuple);
-            if (birthTuple == null) {
-                chunk.skipCurUser();
-                tuple = chunk.getNext();
-                continue;
-            }
             //always update cohort size
             Integer currentSize = cohortSizeMap.get(tuple.stringValues.get(cohortColumn));
             if (currentSize == null) {
                 currentSize = 0;
             }
             String birthValue = tuple.stringValues.get(cohortColumn);
-            long birthTime = birthTuple.time;
             cohortSizeMap.put(birthValue, currentSize + 1);
-
+            Tuple birthTuple = getBirthTuple(tuple);
+            if (birthTuple == null) {
+                //Workaround for users with only one tuple
+                if (chunk.getCurrentUser().u == currentUser) {
+                    chunk.skipCurUser();
+                }
+                tuple = chunk.getNext();
+                continue;
+            }
+            long birthTime = birthTuple.time;
             //check if user is qualified
             if (condition.isBirthTupleQualified(birthTuple)) {
                 while (tuple.user == currentUser) {
@@ -65,7 +67,10 @@ public class AggregationOperator extends Operator {
                     }
                 }
             } else {
-                chunk.skipCurUser();
+                //Workaround for users with only one tuple
+                if (chunk.getCurrentUser().u == currentUser) {
+                    chunk.skipCurUser();
+                }
                 tuple = chunk.getNext();
             }
         }
